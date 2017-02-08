@@ -16,4 +16,7 @@
     <string name="registration_failed">Registration Failed</string>
     <string name="registration_successful">Registration Success</string>
     <string name="registering">Registering</string>
+    <string name="hint_profile">Profile Name</string>
+    <string name="hint_new_profile">New Profile</string>
+    <string name="profile_mandatory">Profile Name is Mandatory</string>
 </resources>

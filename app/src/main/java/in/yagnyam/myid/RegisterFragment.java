@@ -21,6 +21,7 @@ import java.util.Date;
 
 import in.yagnyam.digid.registerApi.model.RegistrationRequest;
 import in.yagnyam.digid.registerApi.model.RegistrationResponse;
+import in.yagnyam.myid.model.ProfileEntry;
 import in.yagnyam.myid.utils.PemUtils;
 
 public class RegisterFragment extends BaseFragment {
@@ -29,6 +30,7 @@ public class RegisterFragment extends BaseFragment {
 
     private RegisterTask mRegisterTask = null;
 
+    private TextInputEditText profileNameEditText;
     private TextInputEditText digitdEditText;
     private TextInputEditText passwordEditText;
     private OnFragmentInteractionListener mListener;
@@ -54,8 +56,8 @@ public class RegisterFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_register, container, false);
+        profileNameEditText = (TextInputEditText) rootView.findViewById(R.id.profileNameEditText);
         digitdEditText = (TextInputEditText) rootView.findViewById(R.id.digitdEditText);
-        digitdEditText.setText(AppConstants.getDigid(getContext()));
         passwordEditText = (TextInputEditText) rootView.findViewById(R.id.passwordEditText);
         Button registerButton = (Button) rootView.findViewById(R.id.registerButton);
         registerButton.setOnClickListener(new View.OnClickListener() {
@@ -72,6 +74,11 @@ public class RegisterFragment extends BaseFragment {
     private boolean isValid() {
         View focusView = null;
         boolean valid = true;
+        if (TextUtils.isEmpty(profileNameEditText.getText()) || profileNameEditText.getText().toString().trim().isEmpty()) {
+            valid = false;
+            focusView = focusView != null ? focusView : profileNameEditText;
+            profileNameEditText.setError(getString(R.string.profile_mandatory));
+        }
         if (TextUtils.isEmpty(digitdEditText.getText()) || digitdEditText.getText().toString().trim().isEmpty()) {
             valid = false;
             focusView = focusView != null ? focusView : digitdEditText;
@@ -90,6 +97,7 @@ public class RegisterFragment extends BaseFragment {
 
 
     private void register() {
+        String profileName = profileNameEditText.getText().toString().trim();
         String digid = digitdEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString();
         try {
@@ -99,7 +107,7 @@ public class RegisterFragment extends BaseFragment {
             RegistrationRequest request = new RegistrationRequest();
             request.setVerificationKey(publicKey);
             showProgressDialog(R.string.registering);
-            mRegisterTask = new RegisterTask(getContext(), digid, password, request);
+            mRegisterTask = new RegisterTask(getContext(), profileName, digid, password, request);
             mRegisterTask.execute((Void) null);
         } catch (Throwable t) {
             Log.e(TAG, "failed to make registration request", t);
@@ -133,12 +141,14 @@ public class RegisterFragment extends BaseFragment {
     public class RegisterTask extends AsyncTask<Void, Void, RegistrationResponse> {
 
         private final Context context;
+        private final String profileName;
         private final String digid;
         private final String password;
         private final RegistrationRequest registrationRequest;
 
-        RegisterTask(Context context, String digid, String password, RegistrationRequest request) {
+        RegisterTask(Context context, String profileName, String digid, String password, RegistrationRequest request) {
             this.context = context;
+            this.profileName = profileName;
             this.digid = digid;
             this.password = password;
             this.registrationRequest = request;
@@ -183,10 +193,15 @@ public class RegisterFragment extends BaseFragment {
         }
 
         private void persistResponse(RegistrationResponse response) {
-            AppConstants.setBsn(context, response.getBsn());
-            AppConstants.setNodePath(context, response.getPath());
-            AppConstants.setDob(context, new Date(response.getDob().getValue()));
-            AppConstants.setDigid(context, response.getDigid());
+
+            ProfileEntry profile = new ProfileEntry();
+            profile.setProfileId(response.getPath());
+            profile.setProfileName(profileName);
+            profile.setBsn(response.getBsn());
+            profile.setDigid(response.getDigid());
+            profile.setDob(new Date(response.getDob().getValue()));
+            profile.setPath(response.getPath());
+            profile.setName(response.getName());
         }
 
         private void handleError(String error) {

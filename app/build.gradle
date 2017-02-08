@@ -45,11 +45,14 @@ dependencies {
         exclude(group: 'com.google.android.google-play-services', module: 'google-play-services')
         exclude(group: 'org.apache.httpcomponents', module: 'httpclient')
     }
+    compile 'org.bitbucket.b_c:jose4j:0.5.4'
 
     compile 'com.android.support:multidex:1.0.1'
 
     compile('in.yagnyam.digid:registerApi:v1-1.22.0-SNAPSHOT')
     compile 'in.yagnyam.myid:myid-lib:1.0-SNAPSHOT'
+
+    compile 'org.projectlombok:lombok:1.16.10'
 
     testCompile 'junit:junit:4.12'
 
