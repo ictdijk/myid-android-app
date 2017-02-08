@@ -70,8 +70,9 @@ public class WelcomeFragment extends Fragment {
 
 
     private void signUp() {
-        AppConstants.setName(getContext(), nameEditText.getText().toString().trim());
-        KeyPair keyPair = UserKeyStore.createNewKeyPair(getContext());
+        String name = nameEditText.getText().toString().trim();
+        KeyPair keyPair = UserKeyStore.createNewKeyPair(getContext(), name);
+        AppConstants.setName(getContext(), name);
         if (mListener != null) {
             mListener.onWelcomeFinish();
         }

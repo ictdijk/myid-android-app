@@ -98,15 +98,12 @@ public class RegisterFragment extends BaseFragment {
             // String privateKey = PemUtils.encodePrivateKey(keyPair.getPrivate());
             RegistrationRequest request = new RegistrationRequest();
             request.setVerificationKey(publicKey);
-            mRegisterTask = new RegisterTask(digid, password, request);
+            showProgressDialog(R.string.registering);
+            mRegisterTask = new RegisterTask(getContext(), digid, password, request);
             mRegisterTask.execute((Void) null);
-
         } catch (Throwable t) {
             Log.e(TAG, "failed to make registration request", t);
             return;
-        }
-        if (mListener != null) {
-            mListener.onRegistration();
         }
     }
 
@@ -135,11 +132,13 @@ public class RegisterFragment extends BaseFragment {
 
     public class RegisterTask extends AsyncTask<Void, Void, RegistrationResponse> {
 
+        private final Context context;
         private final String digid;
         private final String password;
         private final RegistrationRequest registrationRequest;
 
-        RegisterTask(String digid, String password, RegistrationRequest request) {
+        RegisterTask(Context context, String digid, String password, RegistrationRequest request) {
+            this.context = context;
             this.digid = digid;
             this.password = password;
             this.registrationRequest = request;
@@ -149,7 +148,7 @@ public class RegisterFragment extends BaseFragment {
         protected RegistrationResponse doInBackground(Void... params) {
             Log.d(TAG, "RegisterTask.doInBackground()");
             try {
-                return ApiHome.getRegisterApiHandle(getContext(), digid, password).register(registrationRequest).execute();
+                return ApiHome.getRegisterApiHandle(context, digid, password).register(registrationRequest).execute();
             } catch (HttpResponseException e) {
                 Log.e(TAG, "error while registering user", e);
                 return null;
@@ -166,13 +165,13 @@ public class RegisterFragment extends BaseFragment {
             mRegisterTask = null;
             hideProgressDialog();
             if (result != null) {
-                Toast.makeText(getActivity(), getString(R.string.registration_successful), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getString(R.string.registration_successful), Toast.LENGTH_LONG).show();
                 persistResponse(result);
                 if (mListener != null) {
                     mListener.onRegistration();
                 }
             } else {
-                Toast.makeText(getActivity(), getString(R.string.registration_failed), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getString(R.string.registration_failed), Toast.LENGTH_LONG).show();
             }
         }
 
@@ -184,7 +183,6 @@ public class RegisterFragment extends BaseFragment {
         }
 
         private void persistResponse(RegistrationResponse response) {
-            Context context = getContext();
             AppConstants.setBsn(context, response.getBsn());
             AppConstants.setNodePath(context, response.getPath());
             AppConstants.setDob(context, new Date(response.getDob().getValue()));
@@ -194,7 +192,7 @@ public class RegisterFragment extends BaseFragment {
         private void handleError(String error) {
             mRegisterTask = null;
             hideProgressDialog();
-            Toast.makeText(getActivity(), error, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show();
         }
 
     }

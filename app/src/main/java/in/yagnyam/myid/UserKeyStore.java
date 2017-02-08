@@ -5,6 +5,7 @@ import android.security.KeyPairGeneratorSpec;
 import android.util.Log;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
@@ -20,8 +21,13 @@ import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Random;
+
+import javax.security.auth.x500.X500Principal;
 
 public class UserKeyStore {
 
@@ -88,10 +94,23 @@ public class UserKeyStore {
         throw new RuntimeException("No Key found in Keystore");
     }
 
-    public static KeyPair createNewKeyPair(Context context) {
+
+    public static BigInteger nextSerialNumber() {
+        return new BigInteger(64, new Random());
+    }
+
+    public static KeyPair createNewKeyPair(Context context, String name) {
         try {
+            Calendar startDate = Calendar.getInstance();
+            Calendar endDate = Calendar.getInstance();
+            endDate.add(Calendar.YEAR, 20);
             KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(context)
+                    .setSerialNumber(nextSerialNumber())
                     .setAlias(KEY_ALIAS)
+                    .setKeySize(KEY_SIZE)
+                    .setSubject(new X500Principal("CN=" + name))
+                    .setStartDate(startDate.getTime())
+                    .setEndDate(endDate.getTime())
                     .setKeySize(KEY_SIZE)
                     // TODO: Enable this feature
                     // .setEncryptionRequired()
