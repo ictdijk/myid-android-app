@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">MijD</string>
+    <string name="action_signup">Start</string>
+    <string name="hint_name">Name</string>
+    <string name="name_mandatory">Name is Mandatory</string>
+    <string name="id_mandatory">ID Mandatory</string>
+    <string name="hint_id">National ID</string>
+    <string name="hint_dob">DOB</string>
+    <string name="hint_identity">National Identity</string>
+    <string name="dob_mandatory">Date of Birth is Mandatory</string>
+    <string name="invalid_dob">Invalid Date of Birth</string>
+    <string name="action_register">Register</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_digid">DigiD</string>
+    <string name="hint_register">Register</string>
+    <string name="registration_failed">Registration Failed</string>
+    <string name="registration_successful">Registration Success</string>
+</resources>
