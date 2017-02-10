@@ -3,5 +3,17 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimarySel">#FF8055</color>
+    <color name="colorRipple">#00EEF4</color>
+    <color name="colorDark">#008588</color>
     <color name="divider">#1A000000</color>
+    <color name="red">#D90000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="white_50">#80FFFFFF</color>
+    <color name="white_60">#99FFFFFF</color>
+    <color name="white_40">#66FFFFFF</color>
+    <color name="black">#161616</color>
+    <color name="black_50">#80000000</color>
+    <color name="black_30">#4D000000</color>
+    <color name="black_80">#CC000000</color>
 </resources>

@@ -2,15 +2,9 @@
     <menu xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
         <item
-            android:id="@+id/miCompose"
-            android:titleCondensed="@string/app_name"
+            android:id="@+id/new_profile"
+            android:titleCondensed="@string/new_profile"
             app:showAsAction="never"
-            android:title="Compose">
-        </item>
-        <item
-            android:id="@+id/miProfile"
-            android:titleCondensed="@string/app_name"
-            app:showAsAction="never"
-            android:title="Profile">
+            android:title="New Profile">
         </item>
     </menu>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+	
+	<servlet>
+		<servlet-name>AssetLinksJsp</servlet-name>
+		<jsp-file>/WEB-INF/admin/assetlinks.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AssetLinksJsp</servlet-name>
+		<url-pattern>/.well-known/assetlinks.json</url-pattern>
+	</servlet-mapping>
+
+</web-app>

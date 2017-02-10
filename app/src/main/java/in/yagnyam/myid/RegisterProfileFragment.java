@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,12 +20,13 @@ import java.util.Date;
 
 import in.yagnyam.digid.registerApi.model.RegistrationRequest;
 import in.yagnyam.digid.registerApi.model.RegistrationResponse;
+import in.yagnyam.myid.data.DbHelper;
 import in.yagnyam.myid.model.ProfileEntry;
 import in.yagnyam.myid.utils.PemUtils;
 
-public class RegisterFragment extends BaseFragment {
+public class RegisterProfileFragment extends BaseFragment {
 
-    private static final String TAG = "RegisterFragment";
+    private static final String TAG = "RegisterProfileFragment";
 
     private RegisterTask mRegisterTask = null;
 
@@ -35,11 +35,11 @@ public class RegisterFragment extends BaseFragment {
     private TextInputEditText passwordEditText;
     private OnFragmentInteractionListener mListener;
 
-    public RegisterFragment() {
+    public RegisterProfileFragment() {
     }
 
-    public static RegisterFragment newInstance() {
-        RegisterFragment fragment = new RegisterFragment();
+    public static RegisterProfileFragment newInstance() {
+        RegisterProfileFragment fragment = new RegisterProfileFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -55,7 +55,7 @@ public class RegisterFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_register, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_register_profile, container, false);
         profileNameEditText = (TextInputEditText) rootView.findViewById(R.id.profileNameEditText);
         digitdEditText = (TextInputEditText) rootView.findViewById(R.id.digitdEditText);
         passwordEditText = (TextInputEditText) rootView.findViewById(R.id.passwordEditText);
@@ -134,7 +134,7 @@ public class RegisterFragment extends BaseFragment {
     }
 
     public interface OnFragmentInteractionListener {
-        void onRegistration();
+        void onRegistration(ProfileEntry profile);
     }
 
 
@@ -176,9 +176,9 @@ public class RegisterFragment extends BaseFragment {
             hideProgressDialog();
             if (result != null) {
                 Toast.makeText(context, getString(R.string.registration_successful), Toast.LENGTH_LONG).show();
-                persistResponse(result);
+                ProfileEntry profileEntry = persistResponse(result);
                 if (mListener != null) {
-                    mListener.onRegistration();
+                    mListener.onRegistration(profileEntry);
                 }
             } else {
                 Toast.makeText(context, getString(R.string.registration_failed), Toast.LENGTH_LONG).show();
@@ -192,8 +192,7 @@ public class RegisterFragment extends BaseFragment {
             hideProgressDialog();
         }
 
-        private void persistResponse(RegistrationResponse response) {
-
+        private ProfileEntry persistResponse(RegistrationResponse response) {
             ProfileEntry profile = new ProfileEntry();
             profile.setProfileId(response.getPath());
             profile.setProfileName(profileName);
@@ -202,6 +201,8 @@ public class RegisterFragment extends BaseFragment {
             profile.setDob(new Date(response.getDob().getValue()));
             profile.setPath(response.getPath());
             profile.setName(response.getName());
+            DbHelper.getInstance(context).insertProfile(profile);
+            return profile;
         }
 
         private void handleError(String error) {

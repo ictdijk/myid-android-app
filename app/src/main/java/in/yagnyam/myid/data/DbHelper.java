@@ -1,4 +1,4 @@
-package in.yagnyam.myid;
+package in.yagnyam.myid.data;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 import in.yagnyam.myid.model.ProfileEntry;
 
@@ -126,27 +127,26 @@ public class DbHelper extends SQLiteOpenHelper {
         }
     }
 
-
-    public ProfileEntry insertProfile(ProfileEntry cheque) {
-        db.beginTransaction();
-        try {
-            cheque = ProfileEntry.insertProfile(db, cheque);
-            db.setTransactionSuccessful();
-            return cheque;
-        } finally {
-            db.endTransaction();
-        }
+    public List<ProfileEntry> fetchProfiles() {
+        return ProfileEntry.fetchProfiles(db);
     }
 
-    public ProfileEntry updateProfile(ProfileEntry cheque) {
-        db.beginTransaction();
-        try {
-            cheque = ProfileEntry.updateProfile(db, cheque);
-            db.setTransactionSuccessful();
-            return cheque;
-        } finally {
-            db.endTransaction();
+    public ProfileEntry insertProfile(ProfileEntry profile) {
+        try (DbTransaction transaction = new DbTransaction(db)) {
+            profile = ProfileEntry.insertProfile(db, profile);
+            transaction.setSuccessful();
         }
+        ProfilesDataSet.addProfile(profile);
+        return profile;
+    }
+
+    public ProfileEntry updateProfile(ProfileEntry profile) {
+        try (DbTransaction transaction = new DbTransaction(db)) {
+            profile = ProfileEntry.updateProfile(db, profile);
+            transaction.setSuccessful();
+        }
+        ProfilesDataSet.updateProfile(profile);
+        return profile;
     }
 
 

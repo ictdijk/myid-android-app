@@ -6,11 +6,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import in.yagnyam.myid.DbHelper;
+import in.yagnyam.myid.data.DbHelper;
+import in.yagnyam.myid.utils.StringUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,7 +37,6 @@ public class ProfileEntry implements BaseColumns {
     private static final String COLUMN_NAME_PATH = "path";
     private static final String COLUMN_NAME_DOB = "dob";
 
-
     private static final String[] COLUMN_NAMES = {
             COLUMN_NAME_PROFILE_ID,
             COLUMN_NAME_PROFILE_NAME,
@@ -54,6 +55,31 @@ public class ProfileEntry implements BaseColumns {
     private String path;
     private Date dob;
 
+    private static String addIfValid(String existing, String name, String value) {
+        if (StringUtils.isEmpty(value)) {
+            return existing;
+        } else if (!StringUtils.isEmpty(existing)) {
+            return existing + "\n" + name + ": " + value;
+        } else {
+            return name + ": " + value;
+        }
+    }
+
+    private static String addIfValid(String existing, String name, Date value) {
+        return value == null ? existing : addIfValid(existing, name, value.toString());
+    }
+
+
+    public String getClaims() {
+        String claims = "";
+        claims = addIfValid(claims, "BSN", bsn);
+        claims = addIfValid(claims, "Name", name);
+        claims = addIfValid(claims, "DOB", dob);
+        if (StringUtils.isEmpty(claims)) {
+            claims = "None";
+        }
+        return claims;
+    }
 
     private ContentValues toContentValues() {
         ContentValues values = new ContentValues();
@@ -68,7 +94,7 @@ public class ProfileEntry implements BaseColumns {
     }
 
 
-    public static ProfileEntry create(Cursor cursor) {
+    private static ProfileEntry create(Cursor cursor) {
         ProfileEntry profileEntry = new ProfileEntry();
         profileEntry.profileId = DbHelper.getString(cursor, COLUMN_NAME_PROFILE_ID);
         profileEntry.profileName = DbHelper.getString(cursor, COLUMN_NAME_PROFILE_NAME);
@@ -134,5 +160,15 @@ public class ProfileEntry implements BaseColumns {
         Log.d(TAG, "insertProfile(" + profile + ")");
         db.insert(TABLE_NAME, null, profile.toContentValues());
         return profile;
+    }
+
+    public static List<ProfileEntry> fetchProfiles(SQLiteDatabase db) {
+        List<ProfileEntry> results = new ArrayList<>();
+        Cursor cursor = db.query(TABLE_NAME, COLUMN_NAMES, null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            results.add(create(cursor));
+        }
+        Log.d(TAG, "fetchProfiles() => " + results);
+        return results;
     }
 }

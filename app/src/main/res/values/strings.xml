@@ -19,4 +19,9 @@
     <string name="hint_profile">Profile Name</string>
     <string name="hint_new_profile">New Profile</string>
     <string name="profile_mandatory">Profile Name is Mandatory</string>
+    <string name="show_qr">QR</string>
+    <string name="tap_and_send">Tap</string>
+    <string name="add_profile">Create Profile</string>
+    <string name="no_profiles_create_profile">No profiles, Create</string>
+    <string name="new_profile">New Profile</string>
 </resources>
