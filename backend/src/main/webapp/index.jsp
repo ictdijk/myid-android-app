@@ -24,7 +24,7 @@ pageContext.setAttribute("results", Utils.getClaims(request));
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">MijD</a>
+            <a class="navbar-brand" href="#">MijD Demo</a>
         </div>
 		<!--
         <div class="navbar-collapse collapse">
@@ -38,7 +38,7 @@ pageContext.setAttribute("results", Utils.getClaims(request));
 </div>
 
 <div class="container theme-showcase" role="main">
-			
+			<h1>Amsterdam University</h1>
 			<section>
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -68,7 +68,7 @@ pageContext.setAttribute("results", Utils.getClaims(request));
 		
 		
                     <div class="input-group">
-						<label for="targetUrl">URL to Launch:</label>
+						<label for="targetUrl">Site to Launch/Authorize:</label>
                         <input type="text" class="form-control input-lg" placeholder="Target URL" name="targetUrl" ng-model="targetUrl"></input>
                     </div>
                     <div class="input-group">
@@ -82,7 +82,7 @@ pageContext.setAttribute("results", Utils.getClaims(request));
                     </div-->
 
 					<br/>
-					Typical URL: <a href="https://mijd-jwt.appspot.com/login?ret={{targetUrl}}&audience={{audience}}">https://mijd-jwt.appspot.com/login?ret={{targetUrl}}&audience={{audience}}</a>
+						<a href="https://mijd-jwt.appspot.com/login?ret={{targetUrl}}&audience={{audience}}" class="btn btn-info" role="button">Login</a>
 					<br/>
 					<!--
 					MijD URL: <a href="mijd://mijd-jwt.appspot.com/login?ret={{targetUrl}}&audience={{audience}}">mijd://mijd-jwt.appspot.com/login?ret={{targetUrl}}&audience={{audience}}</a>

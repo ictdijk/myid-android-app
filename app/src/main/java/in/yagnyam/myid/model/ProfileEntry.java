@@ -40,6 +40,10 @@ public class ProfileEntry implements BaseColumns {
     private static final String COLUMN_NAME_DIGID = "digid";
     private static final String COLUMN_NAME_PATH = "path";
     private static final String COLUMN_NAME_DOB = "dob";
+    private static final String COLUMN_NAME_BLOOD_GROUP = "bloodGroup";
+    private static final String COLUMN_NAME_REFUGEE_STATUS = "refugeeStatus";
+    private static final String COLUMN_NAME_DEAF = "deaf";
+    private static final String COLUMN_NAME_DUMB = "dumb";
 
     private static final String[] COLUMN_NAMES = {
             COLUMN_NAME_PROFILE_ID,
@@ -48,7 +52,11 @@ public class ProfileEntry implements BaseColumns {
             COLUMN_NAME_NAME,
             COLUMN_NAME_DIGID,
             COLUMN_NAME_PATH,
-            COLUMN_NAME_DOB
+            COLUMN_NAME_DOB,
+            COLUMN_NAME_BLOOD_GROUP,
+            COLUMN_NAME_REFUGEE_STATUS,
+            COLUMN_NAME_DEAF,
+            COLUMN_NAME_DUMB
     };
 
     private String profileId;
@@ -58,6 +66,10 @@ public class ProfileEntry implements BaseColumns {
     private String digid;
     private String path;
     private Date dob;
+    private String bloodGroup;
+    private String refugeeStatus;
+    private String deaf;
+    private String dumb;
 
     private static String addIfValid(String existing, String name, String value) {
         if (StringUtils.isEmpty(value)) {
@@ -89,6 +101,10 @@ public class ProfileEntry implements BaseColumns {
         claims = addIfValid(claims, "bsn", bsn);
         claims = addIfValid(claims, "dob", dob);
         claims = addIfValid(claims, "name", name);
+        claims = addIfValid(claims, "bloodGroup", bloodGroup);
+        claims = addIfValid(claims, "refugeeStatus", refugeeStatus);
+        claims = addIfValid(claims, "deaf", deaf);
+        claims = addIfValid(claims, "dumb", dumb);
         return claims;
     }
 
@@ -97,6 +113,10 @@ public class ProfileEntry implements BaseColumns {
         description = addIfValid(description, "bsn", bsn);
         description = addIfValid(description, "dob", dob);
         description = addIfValid(description, "name", name);
+        description = addIfValid(description, "bloodGroup", bloodGroup);
+        description = addIfValid(description, "refugeeStatus", refugeeStatus);
+        description = addIfValid(description, "deaf", deaf);
+        description = addIfValid(description, "dumb", dumb);
         if (StringUtils.isEmpty(description)) {
             description = "None";
         }
@@ -111,7 +131,13 @@ public class ProfileEntry implements BaseColumns {
         values.put(COLUMN_NAME_NAME, name);
         values.put(COLUMN_NAME_DIGID, digid);
         values.put(COLUMN_NAME_PATH, path);
-        values.put(COLUMN_NAME_DOB, dob.getTime());
+        if (dob != null) {
+            values.put(COLUMN_NAME_DOB, dob.getTime());
+        }
+        values.put(COLUMN_NAME_BLOOD_GROUP, bloodGroup);
+        values.put(COLUMN_NAME_REFUGEE_STATUS, refugeeStatus);
+        values.put(COLUMN_NAME_DEAF, deaf);
+        values.put(COLUMN_NAME_DUMB, dumb);
         return values;
     }
 
@@ -125,6 +151,10 @@ public class ProfileEntry implements BaseColumns {
         profileEntry.digid = DbHelper.getString(cursor, COLUMN_NAME_DIGID);
         profileEntry.path = DbHelper.getString(cursor, COLUMN_NAME_PATH);
         profileEntry.dob = DbHelper.getDate(cursor, COLUMN_NAME_DOB);
+        profileEntry.bloodGroup = DbHelper.getString(cursor, COLUMN_NAME_BLOOD_GROUP);
+        profileEntry.refugeeStatus = DbHelper.getString(cursor, COLUMN_NAME_REFUGEE_STATUS);
+        profileEntry.deaf = DbHelper.getString(cursor, COLUMN_NAME_DEAF);
+        profileEntry.dumb = DbHelper.getString(cursor, COLUMN_NAME_DUMB);
         return profileEntry;
     }
 
@@ -136,7 +166,11 @@ public class ProfileEntry implements BaseColumns {
                 COLUMN_NAME_NAME + DbHelper.TEXT_TYPE + DbHelper.COMMA_SEP +
                 COLUMN_NAME_DIGID + DbHelper.TEXT_TYPE + DbHelper.COMMA_SEP +
                 COLUMN_NAME_PATH + DbHelper.TEXT_TYPE + DbHelper.COMMA_SEP +
-                COLUMN_NAME_DOB + DbHelper.DATE_TYPE +
+                COLUMN_NAME_DOB + DbHelper.DATE_TYPE + DbHelper.COMMA_SEP +
+                COLUMN_NAME_BLOOD_GROUP + DbHelper.TEXT_TYPE + DbHelper.COMMA_SEP +
+                COLUMN_NAME_REFUGEE_STATUS + DbHelper.TEXT_TYPE + DbHelper.COMMA_SEP +
+                COLUMN_NAME_DEAF + DbHelper.TEXT_TYPE + DbHelper.COMMA_SEP +
+                COLUMN_NAME_DUMB + DbHelper.TEXT_TYPE +
                 " )";
         return Collections.singletonList(createTable);
     }

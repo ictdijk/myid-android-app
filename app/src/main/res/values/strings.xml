@@ -24,4 +24,9 @@
     <string name="add_profile">Create Profile</string>
     <string name="no_profiles_create_profile">No profiles, Create</string>
     <string name="new_profile">New Profile</string>
+    <string name="hint_include_DOB">DOB</string>
+    <string name="hint_include_name">Include Name</string>
+    <string name="hint_include_bsn">BSN</string>
+    <string name="hint_include_blood_group">Blood Group</string>
+    <string name="hint_include_refugee_tatus">Refugee Status</string>
 </resources>

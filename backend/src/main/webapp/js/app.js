@@ -7,6 +7,6 @@
     MyIDController.$inject = ['$scope'];
     function MyIDController($scope) {
         $scope.targetUrl = "https://mijd-jwt.appspot.com/";
-		$scope.audience="/root/nl";
+		$scope.audience="/university/amu";
     }
 })();

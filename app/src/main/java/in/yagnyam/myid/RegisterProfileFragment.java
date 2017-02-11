@@ -10,13 +10,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 import com.google.api.client.http.HttpResponseException;
 
 import java.io.IOException;
 import java.security.KeyPair;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import in.yagnyam.digid.registerApi.model.RegistrationRequest;
 import in.yagnyam.digid.registerApi.model.RegistrationResponse;
@@ -33,6 +36,11 @@ public class RegisterProfileFragment extends BaseFragment {
     private TextInputEditText profileNameEditText;
     private TextInputEditText digitdEditText;
     private TextInputEditText passwordEditText;
+    private CheckBox nameCheckBox;
+    private CheckBox bsnCheckBox;
+    private CheckBox dobCheckBox;
+    private CheckBox bloodGroupCheckBox;
+    private CheckBox refugeeStatusCheckBox;
     private OnFragmentInteractionListener mListener;
 
     public RegisterProfileFragment() {
@@ -59,6 +67,12 @@ public class RegisterProfileFragment extends BaseFragment {
         profileNameEditText = (TextInputEditText) rootView.findViewById(R.id.profileNameEditText);
         digitdEditText = (TextInputEditText) rootView.findViewById(R.id.digitdEditText);
         passwordEditText = (TextInputEditText) rootView.findViewById(R.id.passwordEditText);
+        nameCheckBox = (CheckBox) rootView.findViewById(R.id.nameCheckBox);
+        bsnCheckBox = (CheckBox) rootView.findViewById(R.id.bsnCheckBox);
+        dobCheckBox = (CheckBox) rootView.findViewById(R.id.dobCheckBox);
+        bloodGroupCheckBox = (CheckBox) rootView.findViewById(R.id.bloodGroupCheckBox);
+        refugeeStatusCheckBox = (CheckBox) rootView.findViewById(R.id.refugeeStatusCheckBox);
+
         Button registerButton = (Button) rootView.findViewById(R.id.registerButton);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,6 +120,7 @@ public class RegisterProfileFragment extends BaseFragment {
             // String privateKey = PemUtils.encodePrivateKey(keyPair.getPrivate());
             RegistrationRequest request = new RegistrationRequest();
             request.setVerificationKey(publicKey);
+            addClaims(request);
             showProgressDialog(R.string.registering);
             mRegisterTask = new RegisterTask(getContext(), profileName, digid, password, request);
             mRegisterTask.execute((Void) null);
@@ -113,6 +128,25 @@ public class RegisterProfileFragment extends BaseFragment {
             Log.e(TAG, "failed to make registration request", t);
             return;
         }
+    }
+
+    private void addClaims(RegistrationRequest request, CheckBox checkBox, String claim) {
+        if (checkBox.isChecked()) {
+            List<String> claims = request.getClaims();
+            if (claims == null) {
+                claims = new ArrayList<>();
+                request.setClaims(claims);
+            }
+            claims.add(claim);
+        }
+    }
+
+    private void addClaims(RegistrationRequest request) {
+        addClaims(request, bsnCheckBox, "bsn");
+        addClaims(request, dobCheckBox, "dob");
+        addClaims(request, nameCheckBox, "name");
+        addClaims(request, bloodGroupCheckBox, "bloodGroup");
+        addClaims(request, refugeeStatusCheckBox, "refugeeStatus");
     }
 
 
@@ -194,13 +228,32 @@ public class RegisterProfileFragment extends BaseFragment {
 
         private ProfileEntry persistResponse(RegistrationResponse response) {
             ProfileEntry profile = new ProfileEntry();
+
             profile.setProfileId(response.getPath());
             profile.setProfileName(profileName);
-            profile.setBsn(response.getBsn());
             profile.setDigid(response.getDigid());
-            profile.setDob(new Date(response.getDob().getValue()));
             profile.setPath(response.getPath());
-            profile.setName(response.getName());
+
+            if (bsnCheckBox.isChecked()) {
+                profile.setBsn(response.getBsn());
+            }
+            if (dobCheckBox.isChecked()) {
+                profile.setDob(new Date(response.getDob().getValue()));
+            }
+            if (nameCheckBox.isChecked()) {
+                profile.setName(response.getName());
+            }
+            if (bloodGroupCheckBox.isChecked()) {
+                profile.setBloodGroup(response.getBloodGroup());
+            }
+            if (refugeeStatusCheckBox.isChecked()) {
+                profile.setRefugeeStatus(response.getRefugeeStatus());
+            }
+            if (false) {
+                profile.setDeaf(response.getDeaf());
+                profile.setDumb(response.getDumb());
+            }
+
             DbHelper.getInstance(context).insertProfile(profile);
             return profile;
         }

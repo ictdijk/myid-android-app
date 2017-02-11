@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="5dp"
+        android:layout_margin="10dp"
         cardView:cardCornerRadius="2dp"
         cardView:cardElevation="2dp"
         cardView:contentPadding="5dp">
@@ -28,7 +28,8 @@
                     android:id="@+id/profileNameTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textStyle="bold"
                     android:hint="Profile Name" />
 
                 <TextView
@@ -37,6 +38,8 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
+                    android:paddingTop="5dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:hint="Description" />
 
             </LinearLayout>
