@@ -39,7 +39,7 @@ pageContext.setAttribute("results", Utils.getClaims(request));
 
 <div class="container theme-showcase" role="main">
 			
-							<section>
+			<section>
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Authentication Token</h3>

@@ -1,6 +1,8 @@
 package in.yagnyam.myid;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -50,12 +52,6 @@ public class ProfilesFragment extends BaseFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_tap_and_send:
-                tapAndSend();
-                return false;
-            case R.id.action_scan_and_pay:
-                showQR();
-                return false;
             case R.id.new_profile:
                 if (listener != null) {
                     listener.createProfile();
@@ -65,15 +61,6 @@ public class ProfilesFragment extends BaseFragment {
         }
     }
 
-    public void tapAndSend() {
-        Log.i(TAG, "tapAndSend()");
-    }
-
-
-    public void showQR() {
-        Log.i(TAG, "showQR()");
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -94,7 +81,7 @@ public class ProfilesFragment extends BaseFragment {
         RecyclerViewEmptySupport recyclerView = (RecyclerViewEmptySupport) rootView.findViewById(R.id.recycleView);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setEmptyView(rootView.findViewById(R.id.createProfileFrame));
-        profilesAdapter = ProfilesAdapter.getInstance(getContext(), loginMode);
+        profilesAdapter = ProfilesAdapter.getInstance(getActivity(), loginMode);
         recyclerView.setAdapter(profilesAdapter);
 
         return rootView;
