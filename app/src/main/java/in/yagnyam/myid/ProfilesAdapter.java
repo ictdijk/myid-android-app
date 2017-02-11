@@ -46,7 +46,7 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = dataSet.get(position);
         holder.profileNameTextView.setText(holder.mItem.getProfileName());
-        holder.claimsTextView.setText(holder.mItem.getClaims());
+        holder.descriptionTextView.setText(holder.mItem.getDescription());
     }
 
     @Override
@@ -112,7 +112,7 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.ViewHo
         final Context context;
         final View view;
         final TextView profileNameTextView;
-        final TextView claimsTextView;
+        final TextView descriptionTextView;
         final View menu;
         ProfileEntry mItem;
 
@@ -121,7 +121,7 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.ViewHo
             this.context = context;
             this.view = view;
             profileNameTextView = (TextView) view.findViewById(R.id.profileNameTextView);
-            claimsTextView = (TextView) view.findViewById(R.id.claimsTextView);
+            descriptionTextView = (TextView) view.findViewById(R.id.descriptionTextView);
             menu = view.findViewById(R.id.menu);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -20,7 +20,24 @@ targetCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
     appengineSdk 'com.google.appengine:appengine-java-sdk:1.9.49'
+    compile 'com.google.appengine:appengine-endpoints:1.9.49'
+    compile 'com.google.appengine:appengine-endpoints-deps:1.9.49'
+
     compile 'javax.servlet:servlet-api:2.5'
+    compile 'javax.servlet:jsp-api:2.0'
+    compile 'org.bouncycastle:bcpkix-jdk15on:1.54'
+    compile 'jstl:jstl:1.2'
+    compile 'org.apache.taglibs:taglibs-standard-impl:1.2.5'
+    compile 'org.slf4j:slf4j-simple:1.7.21'
+    compile 'org.bitbucket.b_c:jose4j:0.5.1'
+    compileOnly 'org.projectlombok:lombok:1.16.10'
+
+    compile 'com.google.http-client:google-http-client:1.22.0'
+    compile 'com.google.api-client:google-api-client-appengine:1.22.0'
+    compile 'com.google.http-client:google-http-client-jackson2:1.22.0'
+    compile('in.yagnyam.myid:nodeApi:v1-1.22.0-SNAPSHOT')
+    compile 'in.yagnyam.myid:myid-lib:1.0-SNAPSHOT'
+
 }
 
 appengine {

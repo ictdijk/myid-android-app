@@ -2,6 +2,7 @@ package in.yagnyam.myid;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.provider.Browser;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -11,8 +12,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
 
+import java.net.URLDecoder;
+
 import in.yagnyam.myid.model.ProfileEntry;
 import in.yagnyam.myid.utils.JsonUtils;
+import in.yagnyam.myid.utils.StringUtils;
 
 public class MainActivity extends AppCompatActivity
         implements WelcomeFragment.OnFragmentInteractionListener,
@@ -90,20 +94,39 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void profileSelected(ProfileEntry profileEntry) {
+        Log.d(TAG, "uri: " + getIntent().getData());
         Intent intent = getIntent();
         Uri uri = intent.getData();
-
-        Intent resultIntent = new Intent(REQUEST_MIJD_JWT);
+        if (uri == null || uri.getQueryParameter("ret") == null) {
+            Toast.makeText(this, "Invalid URL: " + intent.getData(), Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+        String targetUrl = URLDecoder.decode(uri.getQueryParameter("ret"));
+        String audience = URLDecoder.decode(uri.getQueryParameter("audience"));
+        Log.d(TAG, "target: " + targetUrl + ", audience: " + audience);
         try {
-            String jwt = TokenIssuer.issueToken("", null, "", null);
-            resultIntent.putExtra(ACTION_RETURN_JWT, jwt);
-            setResult(RESULT_OK, resultIntent);
+            String jwt = TokenIssuer.issueToken(audience, profileEntry.getClaims(), profileEntry.getPath(), UserKeyStore.getKeyPair().getPrivate());
+            startActivity(getTargetIntent(targetUrl, jwt));
+            //resultIntent.putExtra(ACTION_RETURN_JWT, jwt);
+            // setResult(RESULT_OK, resultIntent);
         } catch (Throwable t) {
             Log.e(TAG, "failed to provide authentication Token", t);
-            resultIntent.putExtra(ACTION_RETURN_ERROR, "Error issuing authorization: " + t.getMessage());
-            setResult(RESULT_CANCELED, new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com")));
+            Intent errorIntent = new Intent(REQUEST_MIJD_JWT);
+            errorIntent.putExtra(ACTION_RETURN_ERROR, "Error issuing authorization: " + t.getMessage());
+            setResult(RESULT_CANCELED, errorIntent);
+            Toast.makeText(this, "Invalid URL: " + intent.getData(), Toast.LENGTH_LONG).show();
         }
-        setResult(RESULT_OK, resultIntent);
         finish();
+    }
+
+    private Intent getTargetIntent(String targetUrl, String authToken) {
+        Log.d(TAG, "getTargetIntent(targetUrl: " + targetUrl + ", authToken: " + authToken + ")");
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl));
+        Bundle bundle = new Bundle();
+        bundle.putString("X-MijD", authToken);
+        browserIntent.putExtra(Browser.EXTRA_HEADERS, bundle);
+        return browserIntent;
+
     }
 }

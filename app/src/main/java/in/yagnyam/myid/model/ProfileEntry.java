@@ -6,10 +6,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import in.yagnyam.myid.data.DbHelper;
 import in.yagnyam.myid.utils.StringUtils;
@@ -65,20 +69,38 @@ public class ProfileEntry implements BaseColumns {
         }
     }
 
-    private static String addIfValid(String existing, String name, Date value) {
-        return value == null ? existing : addIfValid(existing, name, value.toString());
+    private static Map<String, Object> addIfValid(Map<String, Object> existing, String name, String value) {
+        if (!StringUtils.isEmpty(value)) {
+            existing.put(name, value);
+        }
+        return existing;
     }
 
+    private static String addIfValid(String existing, String name, Date value) {
+        return value == null ? existing : addIfValid(existing, name, new SimpleDateFormat("yyyy-mm-dd", Locale.getDefault()).format(value));
+    }
 
-    public String getClaims() {
-        String claims = "";
-        claims = addIfValid(claims, "BSN", bsn);
-        claims = addIfValid(claims, "Name", name);
-        claims = addIfValid(claims, "DOB", dob);
-        if (StringUtils.isEmpty(claims)) {
-            claims = "None";
-        }
+    private static Map<String, Object> addIfValid(Map<String, Object> existing, String name, Date value) {
+        return value == null ? existing : addIfValid(existing, name, new SimpleDateFormat("yyyy-mm-dd", Locale.getDefault()).format(value));
+    }
+
+    public Map<String, Object> getClaims() {
+        Map<String, Object> claims = new HashMap<>();
+        claims = addIfValid(claims, "bsn", bsn);
+        claims = addIfValid(claims, "dob", dob);
+        claims = addIfValid(claims, "name", name);
         return claims;
+    }
+
+    public String getDescription() {
+        String description = "";
+        description = addIfValid(description, "bsn", bsn);
+        description = addIfValid(description, "dob", dob);
+        description = addIfValid(description, "name", name);
+        if (StringUtils.isEmpty(description)) {
+            description = "None";
+        }
+        return description;
     }
 
     private ContentValues toContentValues() {
@@ -89,7 +111,7 @@ public class ProfileEntry implements BaseColumns {
         values.put(COLUMN_NAME_NAME, name);
         values.put(COLUMN_NAME_DIGID, digid);
         values.put(COLUMN_NAME_PATH, path);
-        values.put(COLUMN_NAME_PATH, dob.getTime());
+        values.put(COLUMN_NAME_DOB, dob.getTime());
         return values;
     }
 
