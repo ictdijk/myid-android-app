@@ -30,7 +30,7 @@ dependencies {
     compile 'org.apache.taglibs:taglibs-standard-impl:1.2.5'
     compile 'org.slf4j:slf4j-simple:1.7.21'
     compile 'org.bitbucket.b_c:jose4j:0.5.1'
-    compileOnly 'org.projectlombok:lombok:1.16.10'
+    compile 'com.googlecode.objectify:objectify:5.1.12'
 
     compile 'com.google.http-client:google-http-client:1.22.0'
     compile 'com.google.api-client:google-api-client-appengine:1.22.0'
@@ -38,6 +38,7 @@ dependencies {
     compile('in.yagnyam.myid:nodeApi:v1-1.22.0-SNAPSHOT')
     compile 'in.yagnyam.myid:myid-lib:1.0-SNAPSHOT'
 
+    compileOnly 'org.projectlombok:lombok:1.16.10'
 }
 
 appengine {

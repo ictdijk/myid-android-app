@@ -1,5 +1,7 @@
 package in.yagnyam.myid;
 
+import com.googlecode.objectify.ObjectifyService;
+
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.security.Security;
@@ -15,6 +17,7 @@ public class StaticRegistrar {
             }
             done = true;
         }
+        ObjectifyService.register(LoginEntity.class);
         Security.addProvider(new BouncyCastleProvider());
     }
 

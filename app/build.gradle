@@ -76,6 +76,8 @@ dependencies {
 
     compile 'org.projectlombok:lombok:1.16.10'
 
+    compile 'com.journeyapps:zxing-android-embedded:3.4.0'
+
     testCompile 'junit:junit:4.12'
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

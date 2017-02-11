@@ -212,7 +212,7 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.ViewHo
         Log.i(TAG, "showQR()");
         try {
             String token = TokenIssuer.issueToken(null, profileEntry.getClaims(), profileEntry.getPath(), UserKeyStore.getKeyPair().getPrivate());
-            Uri uri = Uri.parse("https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=" + URLEncoder.encode(token));
+            Uri uri = Uri.parse("https://chart.googleapis.com/chart?cht=qr&chs=500x500&chl=" + URLEncoder.encode(token));
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             context.startActivity(intent);
         } catch (Throwable t) {

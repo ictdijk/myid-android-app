@@ -2,6 +2,7 @@ package in.yagnyam.myid;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.Browser;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -12,6 +13,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
 
+import com.google.api.client.http.HttpMethods;
+import com.google.api.client.util.IOUtils;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLDecoder;
 
 import in.yagnyam.myid.model.ProfileEntry;
@@ -97,17 +109,32 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "uri: " + getIntent().getData());
         Intent intent = getIntent();
         Uri uri = intent.getData();
-        if (uri == null || uri.getQueryParameter("ret") == null) {
+
+        String targetUrl;
+        if (uri == null) {
+            Toast.makeText(this, "No URL mentioned.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        } else if (!StringUtils.isEmpty(uri.getQueryParameter("ret"))) {
+            targetUrl = URLDecoder.decode(uri.getQueryParameter("ret"));
+        } else if (!StringUtils.isEmpty(uri.getQueryParameter("authenticate"))) {
+            targetUrl = URLDecoder.decode(uri.getQueryParameter("authenticate"));
+        } else {
             Toast.makeText(this, "Invalid URL: " + intent.getData(), Toast.LENGTH_LONG).show();
             finish();
             return;
         }
-        String targetUrl = URLDecoder.decode(uri.getQueryParameter("ret"));
-        String audience = URLDecoder.decode(uri.getQueryParameter("audience"));
+        Toast.makeText(this, targetUrl, Toast.LENGTH_LONG).show();
+        String audience = uri.getQueryParameter("audience") != null ? URLDecoder.decode(uri.getQueryParameter("audience")) : null;
         Log.d(TAG, "target: " + targetUrl + ", audience: " + audience);
         try {
             String jwt = TokenIssuer.issueToken(audience, profileEntry.getClaims(), profileEntry.getPath(), UserKeyStore.getKeyPair().getPrivate());
-            startActivity(getTargetIntent(targetUrl, jwt));
+            if (!StringUtils.isEmpty(uri.getQueryParameter("ret"))) {
+                startActivity(getTargetIntent(targetUrl, jwt));
+                finish();
+            } else {
+                new LoginTask(targetUrl, jwt).execute();
+            }
             //resultIntent.putExtra(ACTION_RETURN_JWT, jwt);
             // setResult(RESULT_OK, resultIntent);
         } catch (Throwable t) {
@@ -116,8 +143,8 @@ public class MainActivity extends AppCompatActivity
             errorIntent.putExtra(ACTION_RETURN_ERROR, "Error issuing authorization: " + t.getMessage());
             setResult(RESULT_CANCELED, errorIntent);
             Toast.makeText(this, "Invalid URL: " + intent.getData(), Toast.LENGTH_LONG).show();
+            finish();
         }
-        finish();
     }
 
     private Intent getTargetIntent(String targetUrl, String authToken) {
@@ -129,4 +156,39 @@ public class MainActivity extends AppCompatActivity
         return browserIntent;
 
     }
+
+    public class LoginTask extends AsyncTask<String, Void, Void> {
+
+        private final String urlString;
+        private final String data;
+
+        public LoginTask(String url, String data) {
+            this.urlString = url;
+            this.data = data;
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            try {
+                URL url = new URL(urlString);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod(HttpMethods.POST);
+                urlConnection.setDoOutput(false);
+                OutputStream outputPost = new BufferedOutputStream(urlConnection.getOutputStream());
+                outputPost.write(data.getBytes());
+                outputPost.flush();
+                outputPost.close();
+                urlConnection.disconnect();
+            } catch (Exception e) {
+                Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Error sending Token", e);
+            }
+            finish();
+            return null;
+        }
+
+    }
+
+
+
 }

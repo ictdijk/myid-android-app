@@ -11,7 +11,7 @@ pageContext.setAttribute("results", Utils.getClaims(request));
 <html>
 <head>
 	<link rel="alternate" href="android-app://in.yagnyam.myid/https/mijd-jwt.appspot.com" />
-    <title>MijD</title>
+    <title>Amsterdam University</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
 </head>
@@ -21,74 +21,74 @@ pageContext.setAttribute("results", Utils.getClaims(request));
 <body ng-app="MyID" role="document" style="padding-top: 70px;">
 <div ng-controller="MyIDController as myIdController">
 
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">MijD Demo</a>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Amsterdam University</a>
+            </div>
         </div>
-		<!--
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="https://mijd-jwt.appspot.com/login?ret=https%3A%2F%2Fmijd-jwt.appspot.com%2F">Web Login</a></li>
-                <li><a href="mijd://mijd-jwt.appspot.com/login?ret=https%3A%2F%2Fmijd-jwt.appspot.com%2F">MijD Login</a></li>
-            </ul>
-        </div>
-		-->
     </div>
-</div>
 
-<div class="container theme-showcase" role="main">
-			<h1>Amsterdam University</h1>
-			<section>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Authentication Token</h3>
-                    </div>
-                    <div class="panel-body">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Attribute</th>
-                                    <th>Value</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach var="i" items="${results}">
-                                    <tr>
-                                        <td>${i.key}</td>
-                                        <td>${i.value}</td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
+    <div class="container theme-showcase" role="main">
+		<h1>Please login to keep your degree in the Network</h1>
+
+		<c:if test="${not empty results}">
+        <section>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Authentication Token</h3>
                 </div>
-		    <section>
+                <div class="panel-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Attribute</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="i" items="${results}">
+                                <tr>
+                                    <td>${i.key}</td>
+                                    <td>${i.value}</td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <section>
+		</c:if>
+		<c:if test="${empty results}">
+        <section>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title">Scan &amp; Login</h2>
+				</div>
+				<div class="panel-body">
+					<img src="https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl={{loginUrl}}" alt="Session ID bar code"/>
+				</div>
+			</div>
+        <section>
+		</c:if>
+        <div class="input-group">
+            <label for="targetUrl">Site to Launch/Authorize:</label>
+            <input type="text" class="form-control input-lg" placeholder="Target URL" name="targetUrl" ng-model="targetUrl"></input>
+        </div>
+        <div class="input-group">
+            <label for="audience">Audience/Invoker:</label>
+            <input type="text" class="form-control input-lg" placeholder="Audience" name="audience" ng-model="audience"></input>
+        </div>
 
-		
-		
-                    <div class="input-group">
-						<label for="targetUrl">Site to Launch/Authorize:</label>
-                        <input type="text" class="form-control input-lg" placeholder="Target URL" name="targetUrl" ng-model="targetUrl"></input>
-                    </div>
-                    <div class="input-group">
-						<label for="audience">Audience/Invoker:</label>
-                        <input type="text" class="form-control input-lg" placeholder="Audience" name="audience" ng-model="audience"></input>
-                    </div>
-					
-					<!--div class="form-group">
-                        <label for="privateKey">Private Key (Only required if Audience/Invoker is set):</label>
-                        <textarea rows="10" cols="50" class="form-control input-lg" name="privateKey" placeholder="Private Key" ng-model="privateKey"></textarea>
-                    </div-->
+        <!--div class="form-group">
+            <label for="privateKey">Private Key (Only required if Audience/Invoker is set):</label>
+            <textarea rows="10" cols="50" class="form-control input-lg" name="privateKey" placeholder="Private Key" ng-model="privateKey"></textarea>
+        </div-->
 
-					<br/>
-						<a href="https://mijd-jwt.appspot.com/login?ret={{targetUrl}}&audience={{audience}}" class="btn btn-info" role="button">Login</a>
-					<br/>
-					<!--
-					MijD URL: <a href="mijd://mijd-jwt.appspot.com/login?ret={{targetUrl}}&audience={{audience}}">mijd://mijd-jwt.appspot.com/login?ret={{targetUrl}}&audience={{audience}}</a>
-					<br/>
-					-->
-</div>
+        <br/>
+            <a href="https://mijd-jwt.appspot.com/login?ret={{targetUrl}}&audience={{audience}}" class="btn btn-info" role="button">Login</a>
+        <br/>
+    </div>
 
 </div>
 

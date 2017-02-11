@@ -22,7 +22,7 @@
     <string name="show_qr">QR</string>
     <string name="tap_and_send">Tap</string>
     <string name="add_profile">Create Profile</string>
-    <string name="no_profiles_create_profile">No profiles, Create</string>
+    <string name="no_profiles_create_profile">No profiles, Create One</string>
     <string name="new_profile">New Profile</string>
     <string name="hint_include_DOB">DOB</string>
     <string name="hint_include_name">Include Name</string>
