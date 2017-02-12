@@ -34,24 +34,22 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.ViewHo
     private static final String TAG = "ProfilesAdapter";
 
     private final Activity context;
-    private final boolean loginMode;
     private final DataSet<ProfileEntry> dataSet;
     private final Handler handler;
 
     private NfcAdapter nfcAdapter;
     private NdefMessage ndefMessage;
 
-    private ProfilesAdapter(Activity context, boolean loginMode) {
+    private ProfilesAdapter(Activity context) {
         Log.d(TAG, "ProfilesAdapter()");
         this.context = context;
-        this.loginMode = loginMode;
         this.dataSet = ProfilesDataSet.getInstance(context);
         this.handler = new Handler(/*Looper.getMainLooper()*/);
         initNFC();
     }
 
-    public static ProfilesAdapter getInstance(Activity context, boolean loginMode) {
-        ProfilesAdapter ret = new ProfilesAdapter(context, loginMode);
+    public static ProfilesAdapter getInstance(Activity context) {
+        ProfilesAdapter ret = new ProfilesAdapter(context);
         ret.dataSet.registerObserver(ret);
         return ret;
     }
@@ -164,10 +162,8 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.ViewHo
                 @Override
                 public void onClick(View v) {
                     Log.d(TAG, "Profile Chosen: " + mItem);
-                    if (loginMode) {
-                        if (context instanceof Listener) {
-                            ((Listener) context).profileSelected(mItem);
-                        }
+                    if (context instanceof Listener && ((Listener)context).loginMode()) {
+                        ((Listener)context).profileSelected(mItem);
                     } else if (menu.getVisibility() == View.VISIBLE) {
                         menu.setVisibility(View.GONE);
                     } else {
@@ -263,6 +259,7 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.ViewHo
 
     public interface Listener {
         void profileSelected(ProfileEntry profileEntry);
+        boolean loginMode();
     }
 
 }

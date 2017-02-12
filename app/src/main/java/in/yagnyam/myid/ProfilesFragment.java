@@ -1,15 +1,10 @@
 package in.yagnyam.myid;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,17 +15,13 @@ public class ProfilesFragment extends BaseFragment {
     public static final int REQUEST_CODE_PAY = 0x0000c0df; // Only use bottom 16 bits
     private static final String TAG = "ProfilesFragment";
 
-    private static final String LOGIN_MODE = "loginMode";
-
-    private boolean loginMode = false;
     private ProfilesAdapter profilesAdapter;
     private Listener listener;
 
-    public static ProfilesFragment newInstance(boolean loginMode) {
+    public static ProfilesFragment newInstance() {
         Log.d(TAG, "ProfilesFragment.newInstance()");
         ProfilesFragment fragment = new ProfilesFragment();
         Bundle args = new Bundle();
-        args.putBoolean(LOGIN_MODE, loginMode);
         fragment.setArguments(args);
         return fragment;
     }
@@ -40,10 +31,10 @@ public class ProfilesFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            loginMode = getArguments().getBoolean(LOGIN_MODE);
         }
     }
 
+    /*
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
@@ -60,6 +51,7 @@ public class ProfilesFragment extends BaseFragment {
                 return true;
         }
     }
+    */
 
 
     @Override
@@ -81,7 +73,7 @@ public class ProfilesFragment extends BaseFragment {
         RecyclerViewEmptySupport recyclerView = (RecyclerViewEmptySupport) rootView.findViewById(R.id.recycleView);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setEmptyView(rootView.findViewById(R.id.createProfileFrame));
-        profilesAdapter = ProfilesAdapter.getInstance(getActivity(), loginMode);
+        profilesAdapter = ProfilesAdapter.getInstance(getActivity());
         recyclerView.setAdapter(profilesAdapter);
 
         return rootView;

@@ -20,13 +20,9 @@ public class LoginServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doPost(req, resp);
-    }
-
-    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String session = req.getParameter("session");
+        log.info("doPost({})", session);
         /*
         String[] tokens = req.getRequestURI().split("/");
         String session = tokens[tokens.length-1];

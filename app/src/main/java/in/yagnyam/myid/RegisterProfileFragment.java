@@ -65,8 +65,13 @@ public class RegisterProfileFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_register_profile, container, false);
         profileNameEditText = (TextInputEditText) rootView.findViewById(R.id.profileNameEditText);
+
         digitdEditText = (TextInputEditText) rootView.findViewById(R.id.digitdEditText);
+        digitdEditText.setText("alice");
+
         passwordEditText = (TextInputEditText) rootView.findViewById(R.id.passwordEditText);
+        passwordEditText.setText(".");
+
         nameCheckBox = (CheckBox) rootView.findViewById(R.id.nameCheckBox);
         bsnCheckBox = (CheckBox) rootView.findViewById(R.id.bsnCheckBox);
         dobCheckBox = (CheckBox) rootView.findViewById(R.id.dobCheckBox);

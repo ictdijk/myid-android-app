@@ -7,4 +7,10 @@
             app:showAsAction="never"
             android:title="New Profile">
         </item>
+    <item
+        android:id="@+id/scan_qr"
+        android:titleCondensed="@string/scan_qr"
+        app:showAsAction="never"
+        android:title="Scan QR">
+    </item>
     </menu>

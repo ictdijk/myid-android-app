@@ -12,6 +12,7 @@ import com.google.api.client.json.JsonFactory;
 import java.io.IOException;
 
 import in.yagnyam.digid.registerApi.RegisterApi;
+import in.yagnyam.myid.loginApi.LoginApi;
 
 
 public class ApiHome {
@@ -48,4 +49,9 @@ public class ApiHome {
         return registerApiBuilder.build();
     }
 
+    public static LoginApi getLoginApiHandle(Context context) {
+        LoginApi.Builder loginApiBuilder = new LoginApi.Builder(ApiHome.HTTP_TRANSPORT, ApiHome.JSON_FACTORY, httpRequestInitializer());
+        loginApiBuilder.setApplicationName("Android App");
+        return loginApiBuilder.build();
+    }
 }

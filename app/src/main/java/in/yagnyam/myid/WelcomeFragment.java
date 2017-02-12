@@ -42,6 +42,7 @@ public class WelcomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_welcome, container, false);
         nameEditText = (TextInputEditText) rootView.findViewById(R.id.nameEditText);
+        nameEditText.setText("Alice");
         Button signUpButton = (Button) rootView.findViewById(R.id.button_signup);
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -71,6 +71,7 @@ dependencies {
 
     compile 'com.android.support:multidex:1.0.1'
 
+    compile('in.yagnyam.myid:loginApi:v1-1.22.0-SNAPSHOT')
     compile('in.yagnyam.digid:registerApi:v1-1.22.0-SNAPSHOT')
     compile 'in.yagnyam.myid:myid-lib:1.0-SNAPSHOT'
 

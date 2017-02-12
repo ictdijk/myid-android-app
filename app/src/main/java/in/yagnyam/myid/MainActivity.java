@@ -3,31 +3,30 @@ package in.yagnyam.myid;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.provider.Browser;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.api.client.http.HttpMethods;
-import com.google.api.client.util.IOUtils;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 
+import in.yagnyam.digid.registerApi.model.RegistrationResponse;
+import in.yagnyam.myid.loginApi.model.LoginEntity;
 import in.yagnyam.myid.model.ProfileEntry;
-import in.yagnyam.myid.utils.JsonUtils;
 import in.yagnyam.myid.utils.StringUtils;
 
 public class MainActivity extends AppCompatActivity
@@ -42,6 +41,12 @@ public class MainActivity extends AppCompatActivity
     public static final String ACTION_RETURN_JWT = "in.yagnyam.myid.JWT";
     public static final String ACTION_RETURN_ERROR = "in.yagnyam.myid.ERROR";
 
+    private static final String LOGIN_MODE = "loginMode";
+    private static final String LOGIN_URL = "loginUrl";
+
+    private boolean loginMode;
+    private String loginUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,22 +57,53 @@ public class MainActivity extends AppCompatActivity
         launchFragment(chooseFragment());
     }
 
-    private boolean isLoginMode() {
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putBoolean(LOGIN_MODE, loginMode);
+        savedInstanceState.putString(LOGIN_URL, loginUrl);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        loginMode = savedInstanceState.getBoolean(LOGIN_MODE);
+        loginUrl = savedInstanceState.getString(LOGIN_URL);
+    }
+
+    @Override
+    public boolean loginMode() {
         Intent intent = getIntent();
-        return Intent.ACTION_VIEW.equals(intent.getAction());
+        return Intent.ACTION_VIEW.equals(intent.getAction()) || loginMode;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.new_profile:
+                createProfile();
+                return true;
+            case R.id.scan_qr:
+                new IntentIntegrator(this).initiateScan();
+                return true;
+            default:
+                return true;
+        }
+    }
+
 
     private Fragment chooseFragment() {
         if (!AppConstants.hasName(this)) {
             return WelcomeFragment.newInstance();
         } else {
-            return ProfilesFragment.newInstance(isLoginMode());
+            return ProfilesFragment.newInstance();
         }
     }
 
@@ -106,34 +142,39 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void profileSelected(ProfileEntry profileEntry) {
+        loginMode = false;
         Log.d(TAG, "uri: " + getIntent().getData());
         Intent intent = getIntent();
         Uri uri = intent.getData();
 
-        String targetUrl;
-        if (uri == null) {
+        if (uri == null && StringUtils.isEmpty(loginUrl)) {
             Toast.makeText(this, "No URL mentioned.", Toast.LENGTH_LONG).show();
             finish();
             return;
-        } else if (!StringUtils.isEmpty(uri.getQueryParameter("ret"))) {
+        }
+        String targetUrl = null;
+        if (uri != null&& !StringUtils.isEmpty(uri.getQueryParameter("ret"))) {
             targetUrl = URLDecoder.decode(uri.getQueryParameter("ret"));
-        } else if (!StringUtils.isEmpty(uri.getQueryParameter("authenticate"))) {
-            targetUrl = URLDecoder.decode(uri.getQueryParameter("authenticate"));
         } else {
-            Toast.makeText(this, "Invalid URL: " + intent.getData(), Toast.LENGTH_LONG).show();
+            targetUrl = loginUrl;
+        }
+
+        if (StringUtils.isEmpty(targetUrl)) {
+            Toast.makeText(this, "1. Invalid URL: " + intent.getData(), Toast.LENGTH_LONG).show();
             finish();
             return;
         }
         Toast.makeText(this, targetUrl, Toast.LENGTH_LONG).show();
-        String audience = uri.getQueryParameter("audience") != null ? URLDecoder.decode(uri.getQueryParameter("audience")) : null;
+        String audience = uri != null && uri.getQueryParameter("audience") != null ? URLDecoder.decode(uri.getQueryParameter("audience")) : null;
         Log.d(TAG, "target: " + targetUrl + ", audience: " + audience);
         try {
             String jwt = TokenIssuer.issueToken(audience, profileEntry.getClaims(), profileEntry.getPath(), UserKeyStore.getKeyPair().getPrivate());
-            if (!StringUtils.isEmpty(uri.getQueryParameter("ret"))) {
+            if (uri != null && !StringUtils.isEmpty(uri.getQueryParameter("ret"))) {
                 startActivity(getTargetIntent(targetUrl, jwt));
                 finish();
             } else {
-                new LoginTask(targetUrl, jwt).execute();
+                LoginTask task = new LoginTask(targetUrl, jwt);
+                task.execute((Void)null);
             }
             //resultIntent.putExtra(ACTION_RETURN_JWT, jwt);
             // setResult(RESULT_OK, resultIntent);
@@ -142,7 +183,7 @@ public class MainActivity extends AppCompatActivity
             Intent errorIntent = new Intent(REQUEST_MIJD_JWT);
             errorIntent.putExtra(ACTION_RETURN_ERROR, "Error issuing authorization: " + t.getMessage());
             setResult(RESULT_CANCELED, errorIntent);
-            Toast.makeText(this, "Invalid URL: " + intent.getData(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, t.toString(), Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -157,38 +198,78 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public class LoginTask extends AsyncTask<String, Void, Void> {
+    public class LoginTask extends AsyncTask<Void, Void, Void> {
 
         private final String urlString;
         private final String data;
+        private final String session;
 
         public LoginTask(String url, String data) {
+            Log.i(TAG, "Login (" + url + ", " + data + ")");
             this.urlString = url;
             this.data = data;
+            String[] tokens = url.split("=");
+            session = tokens[tokens.length-1];
         }
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected Void doInBackground(Void... params) {
+            Log.i(TAG, "doInBackground (" + urlString + ", " + data + ")");
             try {
+                LoginEntity loginEntity = new LoginEntity();
+                loginEntity.setSession(session);
+                loginEntity.setAuthToken(data);
+                ApiHome.getLoginApiHandle(MainActivity.this).login(loginEntity).execute();
+                /*
                 URL url = new URL(urlString);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod(HttpMethods.POST);
-                urlConnection.setDoOutput(false);
+                urlConnection.setDoOutput(true);
                 OutputStream outputPost = new BufferedOutputStream(urlConnection.getOutputStream());
+                Log.i(TAG, "doInBackground (" + urlString + ", " + data + ")");
                 outputPost.write(data.getBytes());
                 outputPost.flush();
-                outputPost.close();
-                urlConnection.disconnect();
-            } catch (Exception e) {
-                Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-                Log.e(TAG, "Error sending Token", e);
+                Log.i(TAG, "doInBackground (" + urlString + ", " + data + ")");
+                //outputPost.close();
+                //urlConnection.disconnect();
+                */
+                Toast.makeText(MainActivity.this, "Done Authenticating " + urlString, Toast.LENGTH_LONG).show();
+            } catch (Throwable t) {
+                Toast.makeText(MainActivity.this, "Failed to Authenticate: " + t.toString(), Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Error sending Token", t);
             }
-            finish();
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(final Void result) {
+            Toast.makeText(MainActivity.this, "Post Execute", Toast.LENGTH_LONG).show();
+            finish();
+        }
+
+        @Override
+        protected void onCancelled() {
+            Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_LONG).show();
+            finish();
         }
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if(result != null) {
+            if(result.getContents() == null) {
+                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
+            } else {
+                loginUrl = result.getContents();
+                loginMode = !StringUtils.isEmpty(loginUrl);
+                Toast.makeText(this, "Scanned: " + loginUrl, Toast.LENGTH_LONG).show();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
 
 
 }
