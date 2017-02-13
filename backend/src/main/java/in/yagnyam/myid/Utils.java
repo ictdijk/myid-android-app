@@ -1,5 +1,7 @@
 package in.yagnyam.myid;
 
+import com.googlecode.objectify.Key;
+
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.jose4j.jwt.consumer.JwtConsumer;
@@ -17,7 +19,11 @@ import javax.servlet.http.HttpServletRequest;
 import in.yagnyam.myid.nodeApi.NodeApi;
 import in.yagnyam.myid.nodeApi.model.EntityNode;
 import in.yagnyam.myid.utils.PemUtils;
+import in.yagnyam.myid.utils.StringUtils;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
+
+import static com.googlecode.objectify.ObjectifyService.ofy;
 
 @Slf4j
 public class Utils {
@@ -30,7 +36,17 @@ public class Utils {
         String authorization = request.getHeader("X-MijD");
         Map<String, String> results = new HashMap<>();
         if (authorization == null) {
-            return results;
+            String session = request.getParameter("session");
+            if (!StringUtils.isEmpty(session)) {
+                LoginEntity loginEntity = ofy().load().key(Key.create(LoginEntity.class, session)).now();
+                if (loginEntity != null) {
+                    authorization = loginEntity.getAuthToken();
+                } else {
+                    return results;
+                }
+            } else {
+                return results;
+            }
         }
         log.info("X-MijD => {}", authorization);
         results.put("X-MijD", authorization.substring(0, Math.min(authorization.length(), 25)) + "...");

@@ -33,11 +33,10 @@
         $scope.targetUrl = "https://mijd-jwt.appspot.com/";
 		$scope.audience = "/university/amu";
 		$scope.session = Math.floor((Math.random()*10000)+10000);
-		$scope.sessionUrl = "https://mijd-jwt.appspot.com/authenticate/?session="+$scope.session
-		$scope.loginUrl= window.encodeURIComponent($scope.sessionUrl);
+		$scope.sessionUrl = "https://mijd-jwt.appspot.com/_ah/api/loginApi/v1/loginentity/"+$scope.session;
+		$scope.loginUrl =  "https://mijd-jwt.appspot.com/login?session="+$scope.session;
 		RetryRequest(sessionUrl).then(function(token) {
-
-		    $window.location.href = 'https://mijd-jwt.appspot.com/';
+		    $window.location.href = 'https://mijd-jwt.appspot.com/?session=' + $scope.session;
         });
     });
 
